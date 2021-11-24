@@ -31,3 +31,8 @@ rm(list=ls())
 
 file.edit("cleaning/kobe.R")
 rm(list=ls())
+
+# Kumamoto ----------------------------------------------------------------
+
+file.edit("cleaning/yokohama.R")
+rm(list=ls())

@@ -43,6 +43,9 @@ lab_2021 <- read_csv("data/ichinomiya/lab_data/ichinomiya_lab/2021.csv",
                      locale = locale(encoding = "SHIFT-JIS"),
                      na = "－",
                      skip = 1)
+chart <- read_csv("cleaned_data/chart_review/ichinomiya.csv", 
+                     locale = locale(encoding = "SHIFT-JIS"),
+                     na = "")
 
 # DPC ---------------------------------------------------------------------
 
@@ -74,7 +77,7 @@ cases_2019 <- cases_2019 %>%
 cases_2019 <- cases_2019 %>% 
   rename_at(vars(old), ~ new)
 cases_2019 <- cases_2019 %>% 
-  unite(k, starts_with("k"),
+  unite(opek, starts_with("opek"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
@@ -82,10 +85,38 @@ cases_2019 <- cases_2019 %>%
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(prognosis, starts_with("prognosis"),
+  unite(refer, starts_with("refer"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
+  unite(clinic, starts_with("clinic"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>% 
+  unite(adm_style, starts_with("adm_style"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>% 
+  unite(adm_ambul, starts_with("adm_ambul"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>% 
+  unite(disc_to, starts_with("disc_to"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>% 
+  unite(disc_outcome, starts_with("disc_outcome"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(death_24h, starts_with("death_24h"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(adm_before, starts_with("adm_before"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
   unite(height, starts_with("height"),
         sep = "_",
         remove = FALSE,
@@ -94,64 +125,80 @@ cases_2019 <- cases_2019 %>%
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(main, starts_with("main"),
+  unite(smokingidx, starts_with("smokingidx"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(dmain, starts_with("dmain"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(prep, starts_with("prep"),
+  unite(dadm, starts_with("dadm"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(reso, starts_with("reso"),
+  unite(dres, starts_with("dres"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(com1, starts_with("com1"),
+  unite(dcom1, starts_with("dcom1"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(com2, starts_with("com2"),
+  unite(dcom2, starts_with("dcom2"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(com3, starts_with("com3"),
+  unite(dcom3, starts_with("dcom3"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(com4, starts_with("com4"),
+  unite(dcom4, starts_with("dcom4"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(subs1, starts_with("subs1"),
+  unite(ddev1, starts_with("ddev1"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(subs2, starts_with("subs2"),
+  unite(ddev2, starts_with("ddev2"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(subs3, starts_with("subs3"),
+  unite(ddev3, starts_with("ddev3"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(subs4, starts_with("subs4"),
+  unite(ddev4, starts_with("ddev4"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(ope_day, starts_with("ope_day"),
+  unite(opedt, starts_with("opedt"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(adl, starts_with("adl"),
+  unite(adm_adl, starts_with("adm_adl"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(jcs, starts_with("jcs"),
+  unite(disc_adl, starts_with("disc_adl"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(adm_jcs, starts_with("adm_jcs"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>% 
+  unite(disc_jcs, starts_with("disc_jcs"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>% 
+  unite(hughjones, starts_with("hughjones"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE)
-cases_2019 <- cases_2019 %>% 
-  select(-matches("\\d+$"))
+#cases_2019 <- cases_2019 %>% 
+#  select(-matches("\\d+$"))
 cases_2019 %>% write.csv("cleaned_data/ichinomiya/dpc_2019.csv")
 
 # another way
@@ -179,8 +226,24 @@ cases_2020 <- cases_2020 %>%
   select(num)
 cases_2020 <- cases_2020 %>% 
   rename_at(vars(old), ~ new)
-cases_2020 <- cases_2020 %>% 
-  unite(k, starts_with("k"),
+cases_2020 <- cases_2020 %>%
+  unite(id, starts_with("id"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(sex, starts_with("sex"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(opek, starts_with("opek"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(adm_date, starts_with("adm_date"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(disc_date, starts_with("disc_date"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
@@ -188,10 +251,38 @@ cases_2020 <- cases_2020 %>%
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(prognosis, starts_with("prognosis"),
+  unite(refer, starts_with("refer"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
+  unite(clinic, starts_with("clinic"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>% 
+  unite(adm_style, starts_with("adm_style"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>% 
+  unite(adm_ambul, starts_with("adm_ambul"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>% 
+  unite(disc_to, starts_with("disc_to"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>% 
+  unite(disc_outcome, starts_with("disc_outcome"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(death_24h, starts_with("death_24h"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(adm_before, starts_with("adm_before"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
   unite(height, starts_with("height"),
         sep = "_",
         remove = FALSE,
@@ -200,64 +291,80 @@ cases_2020 <- cases_2020 %>%
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(main, starts_with("main"),
+  unite(smokingidx, starts_with("smokingidx"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(dmain, starts_with("dmain"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(prep, starts_with("prep"),
+  unite(dadm, starts_with("dadm"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(reso, starts_with("reso"),
+  unite(dres, starts_with("dres"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(com1, starts_with("com1"),
+  unite(dcom1, starts_with("dcom1"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(com2, starts_with("com2"),
+  unite(dcom2, starts_with("dcom2"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(com3, starts_with("com3"),
+  unite(dcom3, starts_with("dcom3"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(com4, starts_with("com4"),
+  unite(dcom4, starts_with("dcom4"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(subs1, starts_with("subs1"),
+  unite(ddev1, starts_with("ddev1"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(subs2, starts_with("subs2"),
+  unite(ddev2, starts_with("ddev2"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(subs3, starts_with("subs3"),
+  unite(ddev3, starts_with("ddev3"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(subs4, starts_with("subs4"),
+  unite(ddev4, starts_with("ddev4"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(ope_day, starts_with("ope_day"),
+  unite(opedt, starts_with("opedt"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(adl, starts_with("adl"),
+  unite(adm_adl, starts_with("adm_adl"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(jcs, starts_with("jcs"),
+  unite(disc_adl, starts_with("disc_adl"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(adm_jcs, starts_with("adm_jcs"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>% 
+  unite(disc_jcs, starts_with("disc_jcs"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>% 
+  unite(hughjones, starts_with("hughjones"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE)
-cases_2020 <- cases_2020 %>% 
-  select(-matches("\\d+$"))
+#cases_2020 <- cases_2020 %>% 
+#  select(-matches("\\d+$"))
 cases_2020 %>% write.csv("cleaned_data/ichinomiya/dpc_2020.csv")
 
 ## DPC2021
@@ -281,7 +388,23 @@ cases_2021 <- cases_2021 %>%
 cases_2021 <- cases_2021 %>% 
   rename_at(vars(old), ~ new)
 cases_2021 <- cases_2021 %>% 
-  unite(k, starts_with("k"),
+  unite(id, starts_with("id"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(sex, starts_with("sex"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(opek, starts_with("opek"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(adm_date, starts_with("adm_date"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(disc_date, starts_with("disc_date"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
@@ -289,10 +412,38 @@ cases_2021 <- cases_2021 %>%
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(prognosis, starts_with("prognosis"),
+  unite(refer, starts_with("refer"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
+  unite(clinic, starts_with("clinic"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>% 
+  unite(adm_style, starts_with("adm_style"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>% 
+  unite(adm_ambul, starts_with("adm_ambul"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>% 
+  unite(disc_to, starts_with("disc_to"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>% 
+  unite(disc_outcome, starts_with("disc_outcome"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(death_24h, starts_with("death_24h"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(adm_before, starts_with("adm_before"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
   unite(height, starts_with("height"),
         sep = "_",
         remove = FALSE,
@@ -301,81 +452,109 @@ cases_2021 <- cases_2021 %>%
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(main, starts_with("main"),
+  unite(smokingidx, starts_with("smokingidx"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(dmain, starts_with("dmain"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(prep, starts_with("prep"),
+  unite(dadm, starts_with("dadm"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(reso, starts_with("reso"),
+  unite(dres, starts_with("dres"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(com1, starts_with("com1"),
+  unite(dcom1, starts_with("dcom1"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(com2, starts_with("com2"),
+  unite(dcom2, starts_with("dcom2"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(com3, starts_with("com3"),
+  unite(dcom3, starts_with("dcom3"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>% 
-  unite(com4, starts_with("com4"),
+  unite(dcom4, starts_with("dcom4"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(subs1, starts_with("subs1"),
+  unite(ddev1, starts_with("ddev1"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(subs2, starts_with("subs2"),
+  unite(ddev2, starts_with("ddev2"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(subs3, starts_with("subs3"),
+  unite(ddev3, starts_with("ddev3"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(subs4, starts_with("subs4"),
+  unite(ddev4, starts_with("ddev4"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(ope_day, starts_with("ope_day"),
+  unite(opedt, starts_with("opedt"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(adl, starts_with("adl"),
+  unite(adm_adl, starts_with("adm_adl"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE) %>%
-  unite(jcs, starts_with("jcs"),
+  unite(disc_adl, starts_with("disc_adl"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>%
+  unite(adm_jcs, starts_with("adm_jcs"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>% 
+  unite(disc_jcs, starts_with("disc_jcs"),
+        sep = "_",
+        remove = FALSE,
+        na.rm = TRUE) %>% 
+  unite(hughjones, starts_with("hughjones"),
         sep = "_",
         remove = FALSE,
         na.rm = TRUE)
-cases_2021 <- cases_2021 %>% 
-  select(-matches("\\d+$"))
+#cases_2021 <- cases_2021 %>% 
+# select(-matches("\\d+$"))
 cases_2021 %>% write.csv("cleaned_data/ichinomiya/dpc_2021.csv")
 
 ## Combine the datasets
 cases_2019 %>% colnames() %>% length()
 cases_2020 %>% colnames() %>% length()
 cases_2021 %>% colnames() %>% length()
-dpc <- bind_rows(cases_2019, cases_2020)
-dpc <- bind_rows(dpc, cases_2021)
-dpc %>% glimpse()
-dpc %>% colnames()
+#dpc <- bind_rows(cases_2019, cases_2020)
+#dpc <- bind_rows(dpc, cases_2021)
+#dpc %>% glimpse()
+#dpc %>% colnames()
+dpc <- read_csv("cleaned_data/ichinomiya/ichinomiya_complete_sub1.csv",
+                     locale = locale(encoding = "SHIFT-JIS"))
 dpc <- dpc %>% 
-  distinct(id, adm, .keep_all=TRUE) 
-dpc %>% write.csv("cleaned_data/ichinomiya/dpc.csv")
-request <- dpc %>% 
-  filter(str_detect(main, "J86")) %>% 
-  select(id, adm)
-request %>% write.csv("request/ichinishi_request.csv")
+  mutate_all(.funs = ~ as.character(.)) %>% 
+  distinct(id, adm_date, .keep_all=TRUE) %>% 
+  filter(str_detect(dmain, "J86")) %>% 
+  arrange(id, adm_date)
+dpc$adm_adl <- sapply(strsplit(dpc$adm_adl,""), function(x) sum(as.numeric(x))) 
+dpc$disc_adl <- sapply(strsplit(dpc$disc_adl,""), function(x) sum(as.numeric(x))) 
+
+dpc2 <- read_csv("cleaned_data/chart_review/ichinomiya_chart.csv",
+                locale = locale(encoding = "SHIFT-JIS"))
+dpc2 <- dpc2 %>% 
+  mutate_all(.funs = ~ as.character(.)) %>%  
+  filter(str_detect(empyema_or_not, "1")) %>% 
+  arrange(id, adm_date)
+
+dpc <- left_join(dpc2, dpc, by=c("id", "adm_date"))
+screen <- str_c(dpc$id, collapse = "|")
 
 # Procedures --------------------------------------------------------------
 
@@ -395,7 +574,7 @@ abx_2019 <- act_2019 %>%
   ungroup() %>% 
   distinct(id, adm, name, .keep_all=TRUE) 
 
-## procedure 2020
+## abx 2020
 abx_2020 <- act_2020 %>% 
   filter(薬効分類2 == "抗生物質製剤") %>% 
   rename(id = "データ識別番号",
@@ -411,7 +590,7 @@ abx_2020 <- act_2020 %>%
   ungroup() %>% 
   distinct(id, adm, name, .keep_all=TRUE) 
 
-## procedure 2021
+## abx 2021
 abx_2021 <- act_2021 %>% 
   filter(薬効分類2 == "抗生物質製剤") %>% 
   rename(id = "データ識別番号",
@@ -434,6 +613,10 @@ abx <- abx %>%
   mutate_all(.funs = ~ as.character(.)) %>% 
   arrange(id, adm, day) %>% 
   distinct(id, adm, name, .keep_all=TRUE)
+abx$id <- str_sub(abx$id, start = 5)
+abx <- abx %>% 
+  filter(str_detect(id, screen))
+abx$day <- str_replace_all(abx$day, pattern = "-", replacement="")
 abx %>% write.csv("cleaned_data/ichinomiya/abx.csv")
 
 # drainage 2019
@@ -484,6 +667,18 @@ drainage_2021 <- act_2021 %>%
   ungroup() %>% 
   distinct(id, adm, name, .keep_all=TRUE) 
 
+## Combine the datasets
+drainage <- bind_rows(drainage_2019, drainage_2020)
+drainage <- bind_rows(drainage, drainage_2021)
+drainage <- drainage %>% 
+  mutate_all(.funs = ~ as.character(.)) %>% 
+  arrange(id, adm, day) %>% 
+  distinct(id, adm, name, .keep_all=TRUE)
+drainage$id <- str_sub(drainage$id, start = 5)
+drainage <- drainage %>% 
+  filter(str_detect(id, screen))
+drainage$day <- str_replace_all(drainage$day, pattern = "-", replacement="")
+drainage %>% write.csv("cleaned_data/ichinomiya/drainage.csv")
 
 # Culture -----------------------------------------------------------------
 
@@ -498,6 +693,11 @@ culture2019 <- culture2019 %>%
 culture2019 %>% dim()
 culture2019 <- culture2019 %>% 
   select(1:385, -1, -(4:57))
+culture2019$id <- str_sub(culture2019$id, start = 5)
+culture2019 <- culture2019 %>% 
+  filter(str_detect(id, screen)) %>% 
+  filter(organ == "胸水")
+culture2019$day <- str_replace_all(culture2019$day, pattern = "-", replacement="")
 culture2019 %>% write.csv("cleaned_data/ichinomiya/culture2019.csv")
 
 ## culture 2020
@@ -511,6 +711,11 @@ culture2020 <- culture2020 %>%
 culture2020 %>% dim()
 culture2020 <- culture2020 %>% 
   select(1:367, -1, -(4:54))
+culture2020$id <- str_sub(culture2020$id, start = 5)
+culture2020 <- culture2020 %>% 
+  filter(str_detect(id, screen)) %>% 
+  filter(organ == "胸水")
+culture2020$day <- str_replace_all(culture2020$day, pattern = "-", replacement="")
 culture2020 %>% write.csv("cleaned_data/ichinomiya/culture2020.csv")
 
 ## culture 2021
@@ -524,6 +729,11 @@ culture2021 <- culture2021 %>%
 culture2021 %>% dim()
 culture2021 <- culture2021 %>% 
   select(1:378, -1, -(4:56))
+culture2021$id <- str_sub(culture2021$id, start = 5)
+culture2021 <- culture2021 %>% 
+  filter(str_detect(id, screen)) %>% 
+  filter(organ == "胸水")
+culture2021$day <- str_replace_all(culture2021$day, pattern = "-", replacement="")
 culture2021 %>% write.csv("cleaned_data/ichinomiya/culture2021.csv")
 
 # Lab ---------------------------------------------------------------------
@@ -567,5 +777,41 @@ lab <- bind_rows(lab, lab_2021)
 lab <- lab %>% 
   mutate_all(.funs = ~ as.character(.)) %>% 
   arrange(id, desc(day)) 
-lab$name %>% unique()
+lab$id <- str_sub(lab$id, start = 5)
+lab <- lab %>% 
+  filter(str_detect(id, screen)) 
+lab$day <- str_replace_all(lab$day, pattern = "-", replacement="")
 lab %>% write.csv("cleaned_data/ichinomiya/lab.csv")
+
+# each lab result
+lab$name %>% unique()
+blood_wbc <- lab %>% 
+  filter(name == "WBC(JCCLS)"| name == "ＷＢＣ")
+blood_neutro <- lab %>% 
+  filter(name == "Ｎｅｕｔ")
+blood_hb<- lab %>% 
+  filter(name == "Ｈｂ")
+blood_tp<- lab %>% 
+  filter(name == "総タンパク")
+blood_alb<- lab %>% 
+  filter(name == "Ａｌｂ")
+blood_ldh<- lab %>% 
+  filter(name == "ＬＤＨ")
+blood_bun<- lab %>% 
+  filter(name == "ＢＵＮ")
+blood_cre<- lab %>% 
+  filter(name == "ＣＲＥ")
+blood_crp<- lab %>% 
+  filter(name == "ＣＲＰ")
+pleural_pH<- lab %>% 
+  filter(name == "尿PH") #caution
+pleural_ldh<- lab %>% 
+  filter(name == "穿ＬＤＨ")
+pleural_tp<- lab %>% 
+  filter(name == "穿刺蛋白")
+pleural_alb<- lab %>% 
+  filter(name == "WBC(JCCLS)"| name == "ＷＢＣ")
+pleural_glucose<- lab %>% 
+  filter(name == "穿刺　糖")
+
+
