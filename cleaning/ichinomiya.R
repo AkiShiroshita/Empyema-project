@@ -554,7 +554,9 @@ dpc2 <- dpc2 %>%
   arrange(id, adm_date)
 
 dpc <- left_join(dpc2, dpc, by=c("id", "adm_date"))
-screen <- str_c(dpc$id, collapse = "|")
+dpc %>% glimpse()
+
+screen <- str_c(dpc$id, collapse = "|") # for selecting variables
 
 # Procedures --------------------------------------------------------------
 
@@ -620,6 +622,8 @@ abx$day <- str_replace_all(abx$day, pattern = "-", replacement="")
 abx %>% write.csv("cleaned_data/ichinomiya/abx.csv")
 
 # drainage 2019
+# J019:持続的胸腔ドレナージ,J008:胸腔穿刺, J002：ドレーン法  
+
 drainage_2019 <- act_2019 %>% 
   rename(id = "データ識別番号",
          adm = "入院日",
@@ -780,38 +784,133 @@ lab <- lab %>%
 lab$id <- str_sub(lab$id, start = 5)
 lab <- lab %>% 
   filter(str_detect(id, screen)) 
-lab$day <- str_replace_all(lab$day, pattern = "-", replacement="")
+lab <- lab %>% 
+  mutate(day = ymd(day))
 lab %>% write.csv("cleaned_data/ichinomiya/lab.csv")
 
 # each lab result
 lab$name %>% unique()
+lab_label <- c("blood_wbc",
+              "blood_neutro",
+              "blood_hb",
+              "blood_tp",
+              "blood_alb",
+              "blood_ldh",
+              "blood_bun",
+              "blood_cre",
+              "blood_crp",
+              "pleural_ldh",
+              "pleural_tp",
+              "pleural_glucose"
+              )
 blood_wbc <- lab %>% 
   filter(name == "WBC(JCCLS)"| name == "ＷＢＣ")
 blood_neutro <- lab %>% 
   filter(name == "Ｎｅｕｔ")
-blood_hb<- lab %>% 
+blood_hb <- lab %>% 
   filter(name == "Ｈｂ")
-blood_tp<- lab %>% 
+blood_tp <- lab %>% 
   filter(name == "総タンパク")
-blood_alb<- lab %>% 
+blood_alb <- lab %>% 
   filter(name == "Ａｌｂ")
-blood_ldh<- lab %>% 
+blood_ldh <- lab %>% 
   filter(name == "ＬＤＨ")
-blood_bun<- lab %>% 
+blood_bun <- lab %>% 
   filter(name == "ＢＵＮ")
-blood_cre<- lab %>% 
+blood_cre <- lab %>% 
   filter(name == "ＣＲＥ")
-blood_crp<- lab %>% 
+blood_crp <- lab %>% 
   filter(name == "ＣＲＰ")
-pleural_pH<- lab %>% 
-  filter(name == "尿PH") #caution
-pleural_ldh<- lab %>% 
+#pleural_pH <- lab %>% 
+#  filter(name == "尿PH") #caution
+pleural_ldh <- lab %>% 
   filter(name == "穿ＬＤＨ")
-pleural_tp<- lab %>% 
+pleural_tp <- lab %>% 
   filter(name == "穿刺蛋白")
-pleural_alb<- lab %>% 
-  filter(name == "WBC(JCCLS)"| name == "ＷＢＣ")
-pleural_glucose<- lab %>% 
+#pleural_alb<- lab %>% 
+#  filter(name == "XX")
+pleural_glucose <- lab %>% 
   filter(name == "穿刺　糖")
 
+# Combing -----------------------------------------------------------------
 
+dpc %>% glimpse()
+dpc <- dpc %>% 
+  mutate(adm_date = ymd(adm_date),
+         diag_date = ymd(diag_date),
+         last_date = ymd(last_date),
+         disc_date = ymd(disc_date))
+dpc <- dpc %>% 
+  mutate(flag_date1 = str_c(id, as.character(diag_date - 2), sep = "/"),
+         flag_date2 = str_c(id, as.character(diag_date - 1), sep = "/"),
+         flag_date3 = str_c(id, as.character(diag_date), sep = "/"),
+         flag_date4 = str_c(id, as.character(diag_date + 1), sep = "/"),
+         flag_date5 = str_c(id, as.character(diag_date + 2), sep = "/")
+         )
+flag_date1 <- str_c(dpc$flag_date1, collapse = "|")
+flag_date2 <- str_c(dpc$flag_date2, collapse = "|")
+flag_date3 <- str_c(dpc$flag_date3, collapse = "|")
+flag_date4 <- str_c(dpc$flag_date4, collapse = "|")
+flag_date5 <- str_c(dpc$flag_date5, collapse = "|")
+
+dpc <- dpc %>% 
+  mutate_all(.funs = ~ as.character(.))
+## combining drainage data
+drainage <- drainage %>%
+  filter(name == "J0021") %>% 
+  mutate(day = ymd(day)-1,
+         adm = ymd(adm)) %>% 
+  pivot_wider(names_from = name, values_from = day) %>% 
+  rename(drainage = "J0021",
+         adm_date = "adm") %>% 
+  mutate_all(.funs = ~ as.character(.))
+dpc <- left_join(dpc, drainage, by=c("id", "adm_date"))
+
+## combing lab data
+add_lab <- function(data, number, priority){
+  data <- data %>% 
+    mutate(name = lab_label[number],
+           flag = str_c(id, as.character(day), sep = "/")) %>% 
+    filter(str_detect(flag, priority) & !is.na(flag)) %>% 
+    select(id, day, name, result) %>% 
+    distinct(id, .keep_all=TRUE) %>% 
+    pivot_wider(names_from = name, values_from = result) %>% 
+    rename(diag_date = day) %>% 
+    mutate_all(.funs = ~ as.character(.))
+  dpc <- left_join(dpc, data, by=c("id", "diag_date"))
+}
+
+add_lab(blood_tp, 4, flag_date3)
+lab_label[4] #1-12
+blood_tp <- blood_tp %>% 
+  mutate(name = lab_label[4],
+         flag = str_c(id, day, sep = "/")) %>% 
+  filter(#str_detect(flag, flag_date1) | 
+    # str_detect(flag, flag_date2) | 
+    str_detect(flag, flag_date3) & !is.na(flag) #| 
+    # str_detect(flag, flag_date4) | 
+    # str_detect(flag, flag_date5)
+  ) %>% 
+  select(id, day, name, result) %>% 
+  distinct(id, .keep_all=TRUE) %>% 
+  pivot_wider(names_from = name, values_from = result) %>% 
+  rename(diag_date = day) %>% 
+  mutate_all(.funs = ~ as.character(.))
+dpc <- left_join(dpc, blood_tp, by=c("id", "diag_date"))
+
+lab_label[7]
+blood_bun <- blood_bun %>% 
+  mutate(name = lab_label[7],
+         flag = str_c(id, as.character(day), sep = "/")) %>% 
+  filter(#str_detect(flag, flag_date1) | 
+    # str_detect(flag, flag_date2) | 
+    str_detect(flag, flag_date3) #| 
+    # str_detect(flag, flag_date4) | 
+    # str_detect(flag, flag_date5)
+  ) %>% 
+  select(id, day, name, result) %>% 
+  distinct(id, .keep_all=TRUE) %>% 
+  pivot_wider(names_from = name, values_from = result) %>% 
+  rename(diag_date = day) %>% 
+  mutate_all(.funs = ~ as.character(.))
+dpc <- left_join(dpc, blood_bun, by=c("id", "diag_date"))
